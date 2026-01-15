@@ -1,0 +1,1635 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Lixuan + Aurelius</title>
+  <meta name="description" content="Flipbook scrapbook for Lixuan + Aurelius"/>
+
+  <style>
+    :root{
+      /* woody brown background */
+      --bg1:#3a261b;
+      --bg2:#1f140f;
+
+      --paper:#f7f1e6;
+      --paper2:#f2eadc;
+      --ink:#1b1e2a;
+
+      --shadow: 0 18px 56px rgba(0,0,0,.55);
+      --shadowSoft: 0 10px 26px rgba(0,0,0,.18);
+
+      --btnBg: rgba(255,255,255,.10);
+      --btnBgHover: rgba(255,255,255,.16);
+      --btnBorder: rgba(255,255,255,.16);
+
+      --radius: 20px;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      color:#fff;
+
+      /* wood-ish desk vibe */
+      background:
+        radial-gradient(1100px 700px at 20% 10%, rgba(255,214,170,.10), transparent 60%),
+        radial-gradient(900px 600px at 82% 22%, rgba(255,180,120,.08), transparent 55%),
+        radial-gradient(900px 700px at 55% 90%, rgba(255,230,200,.06), transparent 55%),
+        linear-gradient(180deg, var(--bg1), var(--bg2));
+      overflow-x:hidden;
+      position:relative;
+    }
+
+    /* subtle wood grain overlay */
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      opacity:.28;
+      background:
+        repeating-linear-gradient(
+          90deg,
+          rgba(255,255,255,.06) 0px,
+          rgba(255,255,255,.06) 1px,
+          rgba(0,0,0,.02) 2px,
+          rgba(0,0,0,.02) 6px
+        ),
+        repeating-linear-gradient(
+          0deg,
+          rgba(0,0,0,.015) 0px,
+          rgba(0,0,0,.015) 1px,
+          transparent 2px,
+          transparent 10px
+        );
+      mix-blend-mode: overlay;
+    }
+
+    /* topbar */
+    .top{
+      position:sticky; top:0; z-index:50;
+      background: rgba(20,14,10,.62);
+      backdrop-filter: blur(10px);
+      border-bottom:1px solid rgba(255,255,255,.10);
+    }
+    .top-inner{
+      max-width:1100px;
+      margin:0 auto;
+      padding:12px 16px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+    .brand{
+      display:flex; gap:10px; align-items:baseline;
+      font-weight:950; letter-spacing:.2px;
+;
+    }
+    .brand small{
+      font-size:12px;
+      font-weight:900;
+      color: rgba(255,255,255,.72);
+      white-space:nowrap;
+    }
+
+    .btn{
+      border:1px solid var(--btnBorder);
+      background: var(--btnBg);
+      color:#fff;
+      padding:10px 12px;
+      border-radius: 14px;
+      font-weight: 950;
+      cursor:pointer;
+      transition:.15s transform, .15s background;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      user-select:none;
+    }
+    .btn:hover{background: var(--btnBgHover)}
+    .btn:active{transform: translateY(1px)}
+    .btn:disabled{opacity:.45; cursor:not-allowed}
+
+    .pager{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding:10px 12px;
+      border-radius: 14px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      font-weight: 950;
+      font-size: 12px;
+      color: rgba(255,255,255,.86);
+    }
+    .dots{
+      display:flex; gap:6px; align-items:center;
+      max-width: 42vw;
+      overflow:auto;
+      padding:2px 2px;
+    }
+    .dot{
+      width:8px; height:8px; border-radius:999px;
+      background: rgba(255,255,255,.22);
+      border:1px solid rgba(255,255,255,.10);
+      cursor:pointer;
+      flex:0 0 auto;
+    }
+    .dot.active{
+      background: rgba(215,183,255,.80);
+      border-color: rgba(215,183,255,.90);
+      box-shadow: 0 0 0 4px rgba(215,183,255,.18);
+    }
+
+    /* stage + book */
+    .stage{
+      max-width:1100px;
+      margin: 22px auto 60px;
+      padding: 0 16px;
+      display:flex;
+      justify-content:center;
+    }
+    .book{
+      width: min(980px, 100%);
+      aspect-ratio: 16 / 10;
+      position:relative;
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+      padding: 16px;
+    }
+    .book::before{
+      content:"";
+      position:absolute;
+      inset: 16px;
+      border-radius: 18px;
+      background:
+        radial-gradient(900px 520px at 50% 16%, rgba(0,0,0,.12), transparent 50%),
+        linear-gradient(90deg,
+          rgba(0,0,0,.20) 0%,
+          rgba(0,0,0,.08) 9%,
+          rgba(0,0,0,.03) 50%,
+          rgba(0,0,0,.08) 91%,
+          rgba(0,0,0,.18) 100%
+        );
+      pointer-events:none;
+    }
+    .book::after{
+      display:none;
+    }
+
+    /* pages */
+    .page{
+      position:absolute;
+      inset: 16px;
+      border-radius: 18px;
+      background:
+        radial-gradient(900px 650px at 30% 18%, rgba(255,255,255,.58), transparent 60%),
+        radial-gradient(900px 700px at 72% 78%, rgba(255,255,255,.42), transparent 60%),
+        linear-gradient(180deg, var(--paper), var(--paper2));
+      color: var(--ink);
+      border: 1px solid rgba(0,0,0,.08);
+      overflow:hidden;
+
+      opacity:0;
+      pointer-events:none;
+
+      transform-origin: left center;
+      transform: perspective(1400px) rotateY(0deg);
+      transition:
+        transform 560ms cubic-bezier(.2,.85,.15,1),
+        opacity 240ms ease;
+      box-shadow: var(--shadowSoft);
+    }
+    .page.active{
+      opacity:1;
+      pointer-events:auto;
+    }
+    .page.flip-out{
+      transform: perspective(1400px) rotateY(-125deg);
+      opacity:0;
+    }
+    .page.flip-in{
+      transform: perspective(1400px) rotateY(0deg);
+      opacity:1;
+    }
+
+    .grain{
+      position:absolute; inset:0;
+      background-image:
+        repeating-linear-gradient(0deg, rgba(0,0,0,.018) 0px, rgba(0,0,0,.018) 1px, transparent 2px, transparent 6px),
+        repeating-linear-gradient(90deg, rgba(0,0,0,.012) 0px, rgba(0,0,0,.012) 1px, transparent 2px, transparent 8px);
+      opacity:.45;
+      mix-blend-mode:multiply;
+      pointer-events:none;
+    }
+
+    .page-inner{
+      position:relative;
+      height:100%;
+      padding: 18px 18px 16px;
+      display:grid;
+      grid-template-rows: auto 1fr; /* notes removed */
+      gap: 12px;
+    }
+
+    .page-head{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap: 12px;
+    }
+    .hgroup{min-width:0}
+    .hgroup h2{
+      margin:0;
+      font-size: 22px;
+      font-weight: 950;
+      letter-spacing:.2px;
+      line-height:1.05;
+    }
+    .hgroup p{
+      margin:6px 0 0;
+      color: rgba(0,0,0,.62);
+      font-weight: 900;
+      font-size: 12px;
+      line-height: 1.4;
+      max-width: 580px;
+    }
+    .tag{
+      background: rgba(15,17,24,.92);
+      color:#fff;
+      border-radius: 999px;
+      padding: 10px 12px;
+      font-weight: 950;
+      font-size: 12px;
+      letter-spacing:.15px;
+      white-space:nowrap;
+      box-shadow: 0 10px 20px rgba(0,0,0,.15);
+    }
+
+    .board{
+      display:grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 12px;
+      align-content:start;
+      overflow:auto;
+      padding-bottom: 2px;
+    }
+
+    /* ========= POLAROID CARD ========= */
+    .card{
+      grid-column: span 4;
+      position:relative;
+      border-radius: 18px;
+      cursor: zoom-in;
+      transform: rotate(var(--rot, 0deg));
+      transition: transform .12s ease;
+      background: transparent;
+    }
+    .card:hover{transform: rotate(var(--rot,0deg)) translateY(-2px)}
+    .card:active{transform: rotate(var(--rot,0deg)) translateY(0px)}
+
+    .card.big{grid-column: span 8}
+    .card.wide{grid-column: span 12}
+
+    .polaroid{
+      position:relative;
+      width:100%;
+      border-radius: 18px;
+      background: rgba(255,255,255,.92);
+      border: 1px solid rgba(0,0,0,.10);
+      box-shadow: 0 12px 26px rgba(0,0,0,.18);
+      overflow:hidden;
+    }
+
+    .polaroid::before{
+      content:"";
+      position:absolute;
+      left: 14px; right: 14px;
+      top: 14px;
+      bottom: 54px;
+      border-radius: 14px;
+      border: 1px solid rgba(0,0,0,.14);
+      opacity:.55;
+      pointer-events:none;
+    }
+
+    .photo-area{ padding: 18px 18px 0; }
+    .photo-window{
+      width:100%;
+      aspect-ratio: var(--ar, 4/3);
+      border-radius: 14px;
+      overflow:hidden;
+      background: transparent;
+      position:relative;
+    }
+    .photo-window img{
+      width:100%;
+      height:100%;
+      object-fit: contain;
+      display:block;
+      background: transparent;
+      transform: translateZ(0);
+    }
+
+    .label{
+      padding: 12px 16px 14px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      font-weight: 950;
+      font-size: 12px;
+      letter-spacing:.12px;
+      color: rgba(0,0,0,.82);
+    }
+    .label span{
+      color: rgba(0,0,0,.55);
+      font-weight: 950;
+      font-size: 11px;
+      white-space:nowrap;
+    }
+
+    .compact .polaroid::before{ bottom: 42px; }
+    .compact .label{ padding: 8px 14px 10px; }
+
+    .split .photo-area{ padding: 18px; }
+    .split .split-grid{
+      display:grid;
+      grid-template-columns: 1.35fr 1fr;
+      gap: 14px;
+      align-items:start;
+    }
+    .split .polaroid::before{
+      left: 14px; right: 14px;
+      top: 14px;
+      bottom: 54px;
+      opacity:.50;
+    }
+    .split .side{
+      padding: 10px 6px 0 0;
+      color: rgba(0,0,0,.70);
+      font-weight: 900;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+    .split .side .side-title{
+      font-weight: 950;
+      color: rgba(0,0,0,.82);
+      margin-bottom: 6px;
+      letter-spacing:.12px;
+    }
+    .split .side .side-body{
+      background: rgba(255,255,255,.55);
+      border: 1px dashed rgba(0,0,0,.16);
+      border-radius: 14px;
+      padding: 10px 12px;
+      min-height: 90px;
+    }
+
+    /* cover hearts (pencil-ish red sketch) */
+    .cover-hearts{
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      opacity:.85;
+    }
+    .cover-hearts svg{
+      position:absolute;
+      width:min(260px, 34%);
+      height:auto;
+      filter: drop-shadow(0 2px 0 rgba(0,0,0,.05));
+    }
+    .cover-hearts .heart-left{ left: 4.5%; top: 18%; transform: rotate(-6deg); }
+    .cover-hearts .heart-right{ right: 4.5%; top: 18%; transform: rotate(7deg); }
+
+    /* ===== steven-hate password gate ===== */
+.page.locked .board{
+  filter: blur(10px);
+  opacity: .22;
+  transform: scale(.995);
+}
+
+.steven-gate{
+  position:absolute;
+  inset:0;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding: 18px;
+  background: rgba(255,255,255,.12);
+  backdrop-filter: blur(10px);
+  z-index: 50;
+}
+
+.page.locked .steven-gate{
+  display:flex;
+}
+
+.steven-panel{
+  width: min(520px, 92%);
+  background: rgba(15,15,20,.70);
+  border: 1px solid rgba(255,255,255,.16);
+  border-radius: 18px;
+  padding: 16px 16px 14px;
+  box-shadow: 0 18px 50px rgba(0,0,0,.45);
+  color:#fff;
+}
+
+.steven-panel h3{
+  margin: 0 0 6px;
+  font-size: 14px;
+  font-weight: 950;
+  letter-spacing:.15px;
+}
+
+.steven-panel p{
+  margin: 0 0 12px;
+  font-size: 12px;
+  font-weight: 900;
+  color: rgba(255,255,255,.82);
+  line-height:1.45;
+}
+
+.steven-row{
+  display:flex;
+  gap:10px;
+  align-items:center;
+}
+
+.steven-input{
+  flex:1;
+  padding: 10px 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,.18);
+  background: rgba(255,255,255,.10);
+  color:#fff;
+  font-weight: 950;
+  outline:none;
+}
+
+.steven-input::placeholder{ color: rgba(255,255,255,.55); }
+
+.steven-hint{
+  margin-top:10px;
+  font-size: 11px;
+  font-weight: 900;
+  color: rgba(255,255,255,.72);
+}
+
+.steven-error{
+  margin-top:10px;
+  font-size: 11px;
+  font-weight: 950;
+  color: rgba(255,120,120,.92);
+  display:none;
+}
+.steven-error.show{ display:block; }
+
+
+    .page-nav{
+      position:absolute;
+      left: 18px;
+      right: 18px;
+      bottom: 16px;
+      display:flex;
+      justify-content:space-between;
+      gap: 10px;
+      pointer-events:none;
+    }
+    .page-nav .btn{
+      pointer-events:auto;
+      background: rgba(15,17,24,.88);
+      border-color: rgba(0,0,0,.10);
+    }
+    .page-nav .btn:hover{background: rgba(15,17,24,.95)}
+
+    @media (max-width: 920px){
+      .book{aspect-ratio: 9/12}
+      .card{grid-column: span 6}
+      .card.big{grid-column: span 12}
+      .card.wide{grid-column: span 12}
+      .split .split-grid{grid-template-columns: 1fr}
+      .split .side{padding: 0 18px 0 18px}
+      .split .polaroid::before{bottom: 54px;}
+      .cover-hearts svg{ width:min(220px, 44%); }
+      .cover-hearts .heart-left{ left: 2.5%; top: 16%; }
+      .cover-hearts .heart-right{ right: 2.5%; top: 16%; }
+    }
+    @media (max-width: 560px){
+      .card{grid-column: span 12}
+      .page-inner{padding: 16px}
+      .page-nav{left:16px; right:16px}
+      .board{overflow:auto}
+      .cover-hearts svg{ width:min(200px, 52%); }
+      .cover-hearts .heart-left{ left: 1.5%; top: 14%; }
+      .cover-hearts .heart-right{ right: 1.5%; top: 14%; }
+    }
+
+    /* zoom modal */
+    .modal{
+      position:fixed;
+      inset:0;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      background: rgba(0,0,0,.78);
+      padding: 16px;
+      z-index: 200;
+    }
+    .modal.open{display:flex}
+    .modal-card{
+      width: min(1100px, 100%);
+      height: min(760px, 100%);
+      background: rgba(15,15,20,.92);
+      border:1px solid rgba(255,255,255,.12);
+      border-radius: 18px;
+      overflow:hidden;
+      display:flex;
+      flex-direction:column;
+    }
+    .modal-top{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      padding: 10px 12px;
+      border-bottom: 1px solid rgba(255,255,255,.10);
+      color:#fff;
+    }
+    .modal-title{
+      font-weight: 950;
+      font-size: 13px;
+      color: rgba(255,255,255,.88);
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      max-width: 70vw;
+    }
+    .modal-body{
+      flex:1;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background: rgba(0,0,0,.25);
+    }
+    .modal-body img{
+      width:100%;
+      height:100%;
+      object-fit: contain;
+    }
+
+    /* toast (kept as-is even though only used by side text now) */
+    .toast{
+      position: fixed;
+      bottom: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(15,15,20,.88);
+      border: 1px solid rgba(255,255,255,.12);
+      color: rgba(255,255,255,.9);
+      padding: 10px 12px;
+      border-radius: 14px;
+      font-size: 12px;
+      font-weight: 950;
+      display:none;
+      z-index: 300;
+      max-width: calc(100vw - 24px);
+    }
+    .toast.show{display:block}
+  </style>
+</head>
+
+<body>
+  <header class="top">
+    <div class="top-inner">
+      <div class="brand">
+        <span>Lixuan + Aurelius</span>
+        <small>scrapbook • next/back to flip pages</small>
+      </div>
+
+      <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+        <button class="btn" id="prevTop">⬅ Back</button>
+
+        <div class="pager">
+          <span id="pageLabel">Page 1 / 1</span>
+          <div class="dots" id="dots"></div>
+        </div>
+
+        <button class="btn" id="nextTop">Next ➡</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="stage">
+    <div class="book" id="book">
+
+      <!-- ===== PAGE 1 (COVER) ===== -->
+      <section class="page active" aria-label="Cover">
+        <div class="grain"></div>
+        <div class="page-inner">
+          <div class="page-head">
+            <div class="hgroup">
+              <h2>Lixuan + Aurelius</h2>
+              <p>flip through our chapters. click the photos to zoom.</p>
+            </div>
+            <div class="tag">#1</div>
+          </div>
+
+          <div class="board">
+            <div class="card wide" style="--rot:-0.4deg;">
+              <div class="polaroid">
+                <div class="photo-area">
+                  <div class="photo-window" style="aspect-ratio: 16/6;">
+                    <!-- hearts -->
+                    <div class="cover-hearts" aria-hidden="true">
+  <!-- left filled crayon heart -->
+  <svg class="heart-left" viewBox="0 0 240 200" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <!-- scribble fill pattern -->
+      <pattern id="crayonFillL" width="10" height="10" patternUnits="userSpaceOnUse">
+        <path d="M-2 9 L9 -2" stroke="rgba(210,0,0,.95)" stroke-width="4" stroke-linecap="round"/>
+        <path d="M1 11 L11 1" stroke="rgba(170,0,0,.55)" stroke-width="3" stroke-linecap="round"/>
+        <path d="M-4 6 L6 -4" stroke="rgba(190,0,0,.35)" stroke-width="2" stroke-linecap="round"/>
+      </pattern>
+
+      <!-- rough crayon jitter -->
+      <filter id="crayonRoughL" x="-20%" y="-20%" width="140%" height="140%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" seed="4" result="noise"/>
+        <feDisplacementMap in="SourceGraphic" in2="noise" scale="3.5" xChannelSelector="R" yChannelSelector="G"/>
+      </filter>
+
+      <!-- add extra grainy shading -->
+      <filter id="crayonShadeL" x="-20%" y="-20%" width="140%" height="140%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.55" numOctaves="1" seed="9" result="n"/>
+        <feColorMatrix in="n" type="matrix"
+          values="
+            0 0 0 0 0.75
+            0 0 0 0 0
+            0 0 0 0 0
+            0 0 0 0.22 0" result="tint"/>
+        <feBlend in="SourceGraphic" in2="tint" mode="multiply"/>
+      </filter>
+    </defs>
+
+    <path
+      d="M120 175
+         C115 150, 55 120, 55 75
+         C55 45, 78 28, 98 28
+         C112 28, 121 38, 120 48
+         C120 37, 130 28, 145 28
+         C168 28, 185 46, 185 72
+         C185 120, 126 150, 120 175Z"
+      fill="url(#crayonFillL)"
+      filter="url(#crayonRoughL)"
+    />
+    <path
+      d="M120 175
+         C115 150, 55 120, 55 75
+         C55 45, 78 28, 98 28
+         C112 28, 121 38, 120 48
+         C120 37, 130 28, 145 28
+         C168 28, 185 46, 185 72
+         C185 120, 126 150, 120 175Z"
+      fill="none"
+      stroke="rgba(160,0,0,.85)"
+      stroke-width="10"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      filter="url(#crayonShadeL)"
+    />
+  </svg>
+
+  <!-- right filled crayon heart -->
+  <svg class="heart-right" viewBox="0 0 240 200" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <pattern id="crayonFillR" width="10" height="10" patternUnits="userSpaceOnUse">
+        <path d="M-2 9 L9 -2" stroke="rgba(210,0,0,.95)" stroke-width="4" stroke-linecap="round"/>
+        <path d="M1 11 L11 1" stroke="rgba(170,0,0,.55)" stroke-width="3" stroke-linecap="round"/>
+        <path d="M-4 6 L6 -4" stroke="rgba(190,0,0,.35)" stroke-width="2" stroke-linecap="round"/>
+      </pattern>
+
+      <filter id="crayonRoughR" x="-20%" y="-20%" width="140%" height="140%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" seed="7" result="noise"/>
+        <feDisplacementMap in="SourceGraphic" in2="noise" scale="3.5" xChannelSelector="R" yChannelSelector="G"/>
+      </filter>
+
+      <filter id="crayonShadeR" x="-20%" y="-20%" width="140%" height="140%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.55" numOctaves="1" seed="11" result="n"/>
+        <feColorMatrix in="n" type="matrix"
+          values="
+            0 0 0 0 0.75
+            0 0 0 0 0
+            0 0 0 0 0
+            0 0 0 0.22 0" result="tint"/>
+        <feBlend in="SourceGraphic" in2="tint" mode="multiply"/>
+      </filter>
+    </defs>
+
+    <path
+      d="M120 175
+         C115 150, 55 120, 55 75
+         C55 45, 78 28, 98 28
+         C112 28, 121 38, 120 48
+         C120 37, 130 28, 145 28
+         C168 28, 185 46, 185 72
+         C185 120, 126 150, 120 175Z"
+      fill="url(#crayonFillR)"
+      filter="url(#crayonRoughR)"
+    />
+    <path
+      d="M120 175
+         C115 150, 55 120, 55 75
+         C55 45, 78 28, 98 28
+         C112 28, 121 38, 120 48
+         C120 37, 130 28, 145 28
+         C168 28, 185 46, 185 72
+         C185 120, 126 150, 120 175Z"
+      fill="none"
+      stroke="rgba(160,0,0,.85)"
+      stroke-width="10"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      filter="url(#crayonShadeR)"
+    />
+  </svg>
+</div>
+
+
+                    <div style="height:100%; display:flex; align-items:center; justify-content:center; text-align:center; padding: 12px;">
+                      <div>
+                        <div style="font-weight:950; font-size:36px; letter-spacing:.25px; color: rgba(0,0,0,.86); line-height:1.15;">
+                          Lixuan <span style="opacity:.55">+</span> Aurelius
+                        </div>
+                        <div style="margin-top:10px; font-weight:950; color: rgba(0,0,0,.62); font-size:14px; line-height:1.6;">
+                           digi scrapbook to flip through whenever you want 
+                        </div>
+                        <div style="margin-top:16px; display:inline-block; padding:10px 12px; border-radius:999px; border:1px solid rgba(0,0,0,.14); background: rgba(255,255,255,.62); font-weight:950; color: rgba(0,0,0,.72);">
+                          Press ➡ to move forward
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="label">first page <span>to be continued…</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="page-nav">
+
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== hinge ===== -->
+      <section class="page" aria-label="hinge">
+        <div class="grain"></div>
+        <div class="page-inner">
+          <div class="page-head">
+            <div class="hgroup">
+              <h2>hinge</h2>
+              <p>the day everything started.</p>
+            </div>
+            <div class="tag">#2</div>
+          </div>
+
+          <div class="board">
+            <div class="card big" style="--rot:-1.0deg" data-title="hinge-1" data-src="assets/hinge/hinge-1.jpeg">
+              <div class="polaroid">
+                <div class="photo-area">
+                  <div class="photo-window">
+                    <img data-src="assets/hinge/hinge-1.jpeg" alt="hinge-1">
+                  </div>
+                </div>
+                <div class="label">can i be your pet ! <span>tap to zoom</span></div>
+              </div>
+            </div>
+
+            <div class="card" style="--rot:1.1deg" data-title="hinge-2" data-src="assets/hinge/hinge-2.jpeg">
+              <div class="polaroid">
+                <div class="photo-area">
+                  <div class="photo-window">
+                    <img data-src="assets/hinge/hinge-2.jpeg" alt="hinge-2">
+                  </div>
+                </div>
+                <div class="label">was actually confident asf that i was gonna win <span>tap to zoom</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="page-nav">
+
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== clashroyale ===== -->
+      <section class="page" aria-label="clashroyale">
+        <div class="grain"></div>
+        <div class="page-inner">
+          <div class="page-head">
+            <div class="hgroup">
+              <h2>clash royale</h2>
+              <p>start of the lore 🤝</p>
+            </div>
+            <div class="tag">#3</div>
+          </div>
+
+          <div class="board">
+            <div class="card wide split" style="--rot:-0.6deg" data-title="clashroyale-1" data-src="assets/clashroyale/clashroyale-1.jpeg">
+              <div class="polaroid">
+                <div class="photo-area">
+                  <div class="split-grid">
+                    <div class="photo-window">
+                      <img data-src="assets/clashroyale/clashroyale-1.jpeg" alt="clashroyale-1">
+                    </div>
+                    <div class="side">
+  <div class="side-title">no picture of me losing, but undisputable evidence of me winning</div>
+</div>
+
+                  </div>
+                </div>
+                <div class="label">HEE HEE HEE HA<span>tap to zoom</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="page-nav">
+
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== tele-1 ===== -->
+      <section class="page" aria-label="tele-1">
+        <div class="grain"></div>
+        <div class="page-inner">
+          <div class="page-head">
+  <div class="hgroup">
+    <h2>tele part 1</h2>
+    <p>slowly getting addicted to talking to you</p>
+  </div>
+  <div class="tag">#4</div>
+</div>
+
+
+          <div class="board">
+            <div class="card" style="--rot:-1.1deg" data-title="tele-1" data-src="assets/tele/tele-1.jpeg">
+              <div class="polaroid">
+                <div class="photo-area"><div class="photo-window"><img data-src="assets/tele/tele-1.jpeg" alt="tele-1"></div></div>
+                <div class="label">goated video call pic <span>tap to zoom</span></div>
+              </div>
+            </div>
+
+            <div class="card" style="--rot:1.0deg" data-title="tele-2" data-src="assets/tele/tele-2.jpeg">
+              <div class="polaroid">
+                <div class="photo-area"><div class="photo-window"><img data-src="assets/tele/tele-2.jpeg" alt="tele-2"></div></div>
+                <div class="label">greatest introduction of all time <span>tap to zoom</span></div>
+              </div>
+            </div>
+
+            <div class="card big" style="--rot:-0.6deg" data-title="tele-3" data-src="assets/tele/tele-3.jpeg">
+              <div class="polaroid">
+                <div class="photo-area"><div class="photo-window"><img data-src="assets/tele/tele-3.jpeg" alt="tele-3"></div></div>
+                <div class="label">call pic #1 (idk why we keep hanging up halfway hehe) <span>tap to zoom</span></div>
+              </div>
+            </div>
+
+            <div class="card compact" style="--rot:1.2deg" data-title="tele-4" data-src="assets/tele/tele-4.jpeg">
+              <div class="polaroid">
+                <div class="photo-area"><div class="photo-window"><img data-src="assets/tele/tele-4.jpeg" alt="tele-4"></div></div>
+                <div class="label">call pic #2 <span>tap to zoom</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="page-nav">
+
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== steven-hate ===== -->
+      <section class="page" aria-label="steven-hate">
+        <div class="grain"></div>
+        <div class="page-inner">
+          <div class="page-head">
+            <div class="hgroup">
+              <h2>steven-hate</h2>
+              <p>as a hater, hate belongs in the scrapbook too 😂</p>
+            </div>
+            <div class="tag">#5</div>
+          </div>
+
+          <div class="board">
+            <div class="card big" style="--rot:-0.9deg" data-title="steven-1" data-src="assets/steven/steven-1.jpeg">
+              <div class="polaroid">
+                <div class="photo-area"><div class="photo-window"><img data-src="assets/steven/steven-1.jpeg" alt="steven-1"></div></div>
+                <div class="label">steven-1 <span>tap to zoom</span></div>
+              </div>
+            </div>
+
+            <div class="card compact" style="--rot:1.0deg" data-title="steven-2" data-src="assets/steven/steven-2.jpeg">
+              <div class="polaroid">
+                <div class="photo-area"><div class="photo-window"><img data-src="assets/steven/steven-2.jpeg" alt="steven-2"></div></div>
+                <div class="label">steven-2 (diabolical) <span>tap to zoom</span></div>
+              </div>
+            </div>
+
+            <div class="card" style="--rot:-0.8deg" data-title="steven-3" data-src="assets/steven/steven-3.jpeg">
+              <div class="polaroid">
+                <div class="photo-area"><div class="photo-window"><img data-src="assets/steven/steven-3.jpeg" alt="steven-3"></div></div>
+                <div class="label">steven-3 <span>tap to zoom</span></div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- steven gate overlay -->
+<div class="steven-gate" id="stevenGate" aria-hidden="true">
+  <div class="steven-panel">
+    <h3>private page 🔒</h3>
+    <p>this page is locked in case uw to share (its not diabolical trust🙂)</p>
+
+    <div class="steven-row">
+      <input class="steven-input" id="stevenPass" type="password" inputmode="numeric"
+             placeholder="enter password" autocomplete="off" />
+      <button class="btn" id="stevenUnlockBtn">Unlock</button>
+    </div>
+
+    <div class="steven-error" id="stevenErr">wrong password</div>
+    <div class="steven-hint"></div>
+  </div>
+</div>
+
+
+          <div class="page-nav">
+
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== telev2 ===== -->
+      <section class="page" aria-label="telev2">
+        <div class="grain"></div>
+        <div class="page-inner">
+          <div class="page-head">
+            <div class="hgroup">
+              <h2>tele part 2</h2>
+              <p>realising i can't go a day without calling you</p>
+            </div>
+            <div class="tag">#6</div>
+          </div>
+
+          <div class="board">
+            <div class="card" style="--rot:-1.2deg" data-title="telev2-1" data-src="assets/telev2/telev2-1.jpeg">
+              <div class="polaroid">
+                <div class="photo-area"><div class="photo-window"><img data-src="assets/telev2/telev2-1.jpeg" alt="telev2-1"></div></div>
+                <div class="label">call pic #3 <span>tap to zoom</span></div>
+              </div>
+            </div>
+
+            <div class="card" style="--rot:1.1deg" data-title="telev2-2" data-src="assets/telev2/telev2-2.jpeg">
+              <div class="polaroid">
+                <div class="photo-area"><div class="photo-window"><img data-src="assets/telev2/telev2-2.jpeg" alt="telev2-2"></div></div>
+                <div class="label">call pic #4 (talking til 7 😭) <span>tap to zoom</span></div>
+              </div>
+            </div>
+
+            <div class="card big" style="--rot:-0.6deg" data-title="telev2-3" data-src="assets/telev2/telev2-3.jpeg">
+              <div class="polaroid">
+                <div class="photo-area"><div class="photo-window"><img data-src="assets/telev2/telev2-3.jpeg" alt="telev2-3"></div></div>
+                <div class="label">call pic #5 <span>tap to zoom</span></div>
+              </div>
+            </div>
+
+            <div class="card compact" style="--rot:0.9deg" data-title="telev2-4" data-src="assets/telev2/telev2-4.jpeg">
+              <div class="polaroid">
+                <div class="photo-area"><div class="photo-window"><img data-src="assets/telev2/telev2-4.jpeg" alt="telev2-4"></div></div>
+                <div class="label">call pic #6 <span>tap to zoom</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="page-nav">
+ 
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== china ===== -->
+      <section class="page" aria-label="china">
+        <div class="grain"></div>
+        <div class="page-inner">
+          <div class="page-head">
+            <div class="hgroup">
+              <h2>china</h2>
+              <p>the overseas chapter (still felt close)</p>
+            </div>
+            <div class="tag">#7 </div>
+          </div>
+
+          <div class="board">
+            <div class="card big" style="--rot:-0.9deg" data-title="china-1" data-src="assets/china/china-1.jpeg">
+              <div class="polaroid">
+                <div class="photo-area"><div class="photo-window"><img data-src="assets/china/china-1.jpeg" alt="china-1"></div></div>
+                <div class="label">the day xi en started hating me <span>tap to zoom</span></div>
+              </div>
+            </div>
+
+            <div class="card" style="--rot:1.2deg" data-title="china-2" data-src="assets/china/china-2.jpeg">
+              <div class="polaroid">
+                <div class="photo-area"><div class="photo-window"><img data-src="assets/china/china-2.jpeg" alt="china-2"></div></div>
+                <div class="label">when you ragebait too hard 😭😭😭 <span>tap to zoom</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="page-nav">
+
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== firstdate ===== -->
+      <section class="page" aria-label="firstdate">
+        <div class="grain"></div>
+        <div class="page-inner">
+          <div class="page-head">
+            <div class="hgroup">
+              <h2>first date</h2>
+              <p>IRL: unlocked</p>
+            </div>
+            <div class="tag">#8</div>
+          </div>
+
+          <div class="board">
+            <div class="card big" style="--rot:-1.0deg" data-title="firstdate-1" data-src="assets/firstdate/firstdate-1.jpeg">
+              <div class="polaroid">
+                <div class="photo-area"><div class="photo-window"><img data-src="assets/firstdate/firstdate-1.jpeg" alt="firstdate-1"></div></div>
+                <div class="label">thought you looked really good on calls, somehow looking even better IRL<span>tap to zoom</span></div>
+              </div>
+            </div>
+
+            <div class="card" style="--rot:1.0deg" data-title="firstdate-2" data-src="assets/firstdate/firstdate-2.jpeg">
+              <div class="polaroid">
+                <div class="photo-area"><div class="photo-window"><img data-src="assets/firstdate/firstdate-2.jpeg" alt="firstdate-2"></div></div>
+                <div class="label">good meal #1 (W planning, thanku baby) <span>tap to zoom</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="page-nav">
+
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== christmas ===== -->
+      <section class="page" aria-label="christmas">
+        <div class="grain"></div>
+        <div class="page-inner">
+          <div class="page-head">
+            <div class="hgroup">
+              <h2>christmas</h2>
+              <p>good food, photobooth, christmas lights</p>
+            </div>
+            <div class="tag">#9</div>
+          </div>
+
+          <div class="board">
+            <div class="card" style="--rot:-1.1deg" data-title="christmas-1" data-src="assets/christmas/christmas-1.jpeg">
+              <div class="polaroid">
+                <div class="photo-area"><div class="photo-window"><img data-src="assets/christmas/christmas-1.jpeg" alt="christmas-1"></div></div>
+                <div class="label">once bitten, twice shyyy <span>tap to zoom</span></div>
+              </div>
+            </div>
+
+            <div class="card big" style="--rot:0.6deg" data-title="christmas-2" data-src="assets/christmas/christmas-2.jpeg">
+              <div class="polaroid">
+                <div class="photo-area"><div class="photo-window"><img data-src="assets/christmas/christmas-2.jpeg" alt="christmas-2"></div></div>
+                <div class="label">we're really a hot couple <span>tap to zoom</span></div>
+              </div>
+            </div>
+
+            <div class="card" style="--rot:-0.8deg" data-title="christmas-3" data-src="assets/christmas/christmas-3.jpeg">
+              <div class="polaroid">
+                <div class="photo-area"><div class="photo-window"><img data-src="assets/christmas/christmas-3.jpeg" alt="christmas-3"></div></div>
+                <div class="label">good meal #2<span>tap to zoom</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="page-nav">
+
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== fam ===== -->
+      <section class="page" aria-label="fam">
+        <div class="grain"></div>
+        <div class="page-inner">
+          <div class="page-head">
+            <div class="hgroup">
+              <h2>fam</h2>
+              <p>the family arc ❤️</p>
+            </div>
+            <div class="tag">#10</div>
+          </div>
+
+          <div class="board">
+            <div class="card" style="--rot:-0.9deg" data-title="fam1-1" data-src="assets/fam/fam1-1.jpeg">
+              <div class="polaroid">
+                <div class="photo-area"><div class="photo-window"><img data-src="assets/fam/fam1-1.jpeg" alt="fam1-1"></div></div>
+                <div class="label">good meal #3 <span>tap to zoom</span></div>
+              </div>
+            </div>
+            <div class="card" style="--rot:1.1deg" data-title="fam1-2" data-src="assets/fam/fam1-2.jpeg">
+              <div class="polaroid">
+                <div class="photo-area"><div class="photo-window"><img data-src="assets/fam/fam1-2.jpeg" alt="fam1-2"></div></div>
+                <div class="label">kidnapping xi en <span>tap to zoom</span></div>
+              </div>
+            </div>
+            <div class="card" style="--rot:-0.7deg" data-title="fam1-3" data-src="assets/fam/fam1-3.jpeg">
+              <div class="polaroid">
+                <div class="photo-area"><div class="photo-window"><img data-src="assets/fam/fam1-3.jpeg" alt="fam1-3"></div></div>
+                <div class="label">lowkey family vibes (feat rabitty) <span>tap to zoom</span></div>
+              </div>
+            </div>
+
+            <div class="card big" style="--rot:0.4deg" data-title="fam2-1" data-src="assets/fam/fam2-1.jpeg">
+              <div class="polaroid">
+                <div class="photo-area"><div class="photo-window"><img data-src="assets/fam/fam2-1.jpeg" alt="fam2-1"></div></div>
+                <div class="label">ting ting has arrived<span>tap to zoom</span></div>
+              </div>
+            </div>
+            <div class="card" style="--rot:1.0deg" data-title="fam2-2" data-src="assets/fam/fam2-2.jpeg">
+              <div class="polaroid">
+                <div class="photo-area"><div class="photo-window"><img data-src="assets/fam/fam2-2.jpeg" alt="fam2-2"></div></div>
+                <div class="label">mug shot type pic <span>tap to zoom</span></div>
+              </div>
+            </div>
+            <div class="card" style="--rot:-0.9deg" data-title="fam2-3" data-src="assets/fam/fam2-3.jpeg">
+              <div class="polaroid">
+                <div class="photo-area"><div class="photo-window"><img data-src="assets/fam/fam2-3.jpeg" alt="fam2-3"></div></div>
+                <div class="label">cute :D <span>tap to zoom</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="page-nav">
+
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== jb ===== -->
+      <section class="page" aria-label="jb">
+        <div class="grain"></div>
+        <div class="page-inner">
+          <div class="page-head">
+            <div class="hgroup">
+              <h2>jb</h2>
+              <p>food + photos + plushies = perfect.</p>
+            </div>
+            <div class="tag">#11</div>
+          </div>
+
+          <div class="board">
+            <div class="card" style="--rot:-1.0deg" data-title="jb-p1-1" data-src="assets/jb/jb-p1-1.jpeg">
+              <div class="polaroid">
+                <div class="photo-area"><div class="photo-window"><img data-src="assets/jb/jb-p1-1.jpeg" alt="jb-p1-1"></div></div>
+                <div class="label">dim sum ! <span>tap to zoom</span></div>
+              </div>
+            </div>
+            <div class="card" style="--rot:1.1deg" data-title="jb-p1-2" data-src="assets/jb/jb-p1-2.jpeg">
+              <div class="polaroid">
+                <div class="photo-area"><div class="photo-window"><img data-src="assets/jb/jb-p1-2.jpeg" alt="jb-p1-2"></div></div>
+                <div class="label">pretty face #2 <span>tap to zoom</span></div>
+              </div>
+            </div>
+
+            <div class="card big" style="--rot:-0.6deg" data-title="jb-p2-1" data-src="assets/jb/jb-p2-1.jpeg">
+              <div class="polaroid">
+                <div class="photo-area"><div class="photo-window"><img data-src="assets/jb/jb-p2-1.jpeg" alt="jb-p2-1"></div></div>
+                <div class="label">had to include this i look really handsome <span>tap to zoom</span></div>
+              </div>
+            </div>
+
+            <div class="card" style="--rot:0.9deg" data-title="jb-p2-2" data-src="assets/jb/jb-p2-2.jpeg">
+              <div class="polaroid">
+                <div class="photo-area"><div class="photo-window"><img data-src="assets/jb/jb-p2-2.jpeg" alt="jb-p2-2"></div></div>
+                <div class="label">baddie vibes <span>tap to zoom</span></div>
+              </div>
+            </div>
+            <div class="card" style="--rot:-0.8deg" data-title="jb-p2-3" data-src="assets/jb/jb-p2-3.jpeg">
+              <div class="polaroid">
+                <div class="photo-area"><div class="photo-window"><img data-src="assets/jb/jb-p2-3.jpeg" alt="jb-p2-3"></div></div>
+                <div class="label">your fav sambal <span>tap to zoom</span></div>
+              </div>
+            </div>
+            <div class="card" style="--rot:1.0deg" data-title="jb-p2-4" data-src="assets/jb/jb-p2-4.jpeg">
+              <div class="polaroid">
+                <div class="photo-area"><div class="photo-window"><img data-src="assets/jb/jb-p2-4.jpeg" alt="jb-p2-4"></div></div>
+                <div class="label">photobooth!! <span>tap to zoom</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="page-nav">
+
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== lecture ===== -->
+      <section class="page" aria-label="lecture">
+        <div class="grain"></div>
+        <div class="page-inner">
+          <div class="page-head">
+            <div class="hgroup">
+              <h2>ntu lecture</h2>
+              <p>“just sitting with you” type of love.</p>
+            </div>
+            <div class="tag">#12</div>
+          </div>
+
+          <div class="board">
+            <div class="card big" style="--rot:-0.9deg" data-title="lecture-1" data-src="assets/lecture/lecture-1.jpeg">
+              <div class="polaroid">
+                <div class="photo-area"><div class="photo-window"><img data-src="assets/lecture/lecture-1.jpeg" alt="lecture-1"></div></div>
+                <div class="label">serving as a reminder for your weekly 周记<span>tap to zoom</span></div>
+              </div>
+            </div>
+            <div class="card" style="--rot:1.0deg" data-title="lecture-2" data-src="assets/lecture/lecture-2.jpeg">
+              <div class="polaroid">
+                <div class="photo-area"><div class="photo-window"><img data-src="assets/lecture/lecture-2.jpeg" alt="lecture-2"></div></div>
+                <div class="label">i look good here too <span>tap to zoom</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="page-nav">
+
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== marcys ===== -->
+      <section class="page" aria-label="marcys">
+        <div class="grain"></div>
+        <div class="page-inner">
+          <div class="page-head">
+            <div class="hgroup">
+              <h2>gf proposal</h2>
+              <p>literally us rn ✨</p>
+            </div>
+            <div class="tag">#13</div>
+          </div>
+
+          <div class="board">
+            <div class="card wide" style="--rot:-0.4deg" data-title="marcys-1" data-src="assets/marcys/marcys-1.jpeg">
+              <div class="polaroid">
+                <div class="photo-area">
+                  <div class="photo-window">
+                    <img data-src="assets/marcys/marcys-1.jpeg" alt="marcys-1">
+                  </div>
+                </div>
+                <div class="label">menu<span>tap to zoom</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="page-nav">
+     
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== LAST PAGE ===== -->
+      <section class="page" aria-label="thank-you">
+        <div class="grain"></div>
+        <div class="page-inner">
+          <div class="page-head">
+            <div class="hgroup">
+              <h2>I love you so much</h2>
+              <p>come back anytime. tell me what other pics you want (i'll update it from time to time).</p>
+            </div>
+            <div class="tag">finale</div>
+          </div>
+
+          <div class="board">
+            <div class="card wide" style="--rot:-0.3deg">
+              <div class="polaroid">
+                <div class="photo-area">
+                  <div class="photo-window" style="aspect-ratio: 16/6;">
+                    <div style="height:100%; display:flex; align-items:center; justify-content:center; text-align:center; padding: 12px;">
+                      <div style="max-width:760px; margin:0 auto;">
+                        <div style="font-weight:950; font-size:34px; letter-spacing:.25px; color: rgba(0,0,0,.86); line-height:1.15;">
+                          thank you for being my girlfriend
+                        </div>
+                        <div style="margin-top:12px; font-weight:950; color: rgba(0,0,0,.62); font-size:14px; line-height:1.6;">
+                          thank you for choosing me, even when i wasn't the easiest to deal with. thank you for letting me be a part of your life. and most importantly, thank you for saying yes. can't wait to experience this new chapter with you — be it the small moments, the loud laughs, the late calls,
+                          and all the next chapters we haven’t even taken photos of yet.
+                        </div>
+                        <div style="margin-top:16px; display:inline-block; padding:10px 12px; border-radius:999px; border:1px solid rgba(0,0,0,.14); background: rgba(255,255,255,.62); font-weight:950; color: rgba(0,0,0,.72);">
+                          (Press ← to flip back too)
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="label">the end <span>but also: to be continued…</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="page-nav">
+
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+  <!-- zoom modal -->
+  <div class="modal" id="modal" aria-hidden="true">
+    <div class="modal-card">
+      <div class="modal-top">
+        <div class="modal-title" id="modalTitle">—</div>
+        <div style="display:flex; gap:10px; align-items:center;">
+          <button class="btn" id="zoomPrev">◀</button>
+          <button class="btn" id="zoomNext">▶</button>
+          <button class="btn" id="zoomClose">Close ✕</button>
+        </div>
+      </div>
+      <div class="modal-body">
+        <img id="modalImg" alt="zoomed photo"/>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast">Saved</div>
+
+  <script>
+    /* ========= set real src from data-src ========= */
+    document.querySelectorAll("img[data-src]").forEach(img => {
+      img.src = img.dataset.src;
+    });
+
+    /* ========= IMPORTANT FIX ========= */
+    function applyAspectToCard(img){
+      const card = img.closest(".card");
+      if(!card) return;
+
+      const nw = img.naturalWidth || 0;
+      const nh = img.naturalHeight || 0;
+      if(nw > 0 && nh > 0){
+        const win = img.closest(".photo-window");
+        if(win){
+          win.style.aspectRatio = `${nw} / ${nh}`;
+        }else{
+          card.style.setProperty("--ar", `${nw} / ${nh}`);
+        }
+      }
+    }
+
+    document.querySelectorAll(".photo-window img").forEach(img => {
+      if(img.complete) applyAspectToCard(img);
+      img.addEventListener("load", () => applyAspectToCard(img));
+    });
+
+    /* ========= flipbook ========= */
+    const pages = [...document.querySelectorAll(".page")];
+    const prevTop = document.getElementById("prevTop");
+    const nextTop = document.getElementById("nextTop");
+    const pageLabel = document.getElementById("pageLabel");
+    const dotsWrap = document.getElementById("dots");
+
+    let pageIndex = 0;
+
+    pages.forEach((_, i) => {
+      const d = document.createElement("div");
+      d.className = "dot" + (i === 0 ? " active" : "");
+      d.title = `Page ${i+1}`;
+      d.addEventListener("click", () => gotoPage(i));
+      dotsWrap.appendChild(d);
+    });
+    const dots = [...document.querySelectorAll(".dot")];
+
+    function updateUI(){
+      pageLabel.textContent = `Page ${pageIndex + 1} / ${pages.length}`;
+      prevTop.disabled = pageIndex === 0;
+      nextTop.disabled = pageIndex === pages.length - 1;
+      dots.forEach((d,i) => d.classList.toggle("active", i === pageIndex));
+
+      pages.forEach((p, i) => {
+        const prev = p.querySelector(".page-prev");
+        const next = p.querySelector(".page-next");
+        if(prev) prev.disabled = (i === 0);
+        if(next) next.disabled = (i === pages.length - 1);
+      });
+
+      const prevCover = document.getElementById("prevCover");
+      const nextCover = document.getElementById("nextCover");
+      if(prevCover) prevCover.disabled = (pageIndex === 0);
+      if(nextCover) nextCover.disabled = (pageIndex === pages.length - 1);
+    }
+
+    function gotoPage(newIndex){
+      if(newIndex === pageIndex || newIndex < 0 || newIndex >= pages.length) return;
+
+      const current = pages[pageIndex];
+      const next = pages[newIndex];
+
+      next.classList.add("active");
+      next.classList.remove("flip-out");
+      next.classList.add("flip-in");
+
+      current.classList.remove("flip-in");
+      current.classList.add("flip-out");
+
+      window.setTimeout(() => {
+        current.classList.remove("active");
+        current.classList.remove("flip-out");
+        next.classList.remove("flip-in");
+      }, 580);
+
+      pageIndex = newIndex;
+      updateUI();
+    }
+
+    function prevPage(){ gotoPage(pageIndex - 1); }
+    function nextPage(){ gotoPage(pageIndex + 1); }
+
+    prevTop.addEventListener("click", prevPage);
+    nextTop.addEventListener("click", nextPage);
+
+    document.querySelectorAll(".page-prev").forEach(b => b.addEventListener("click", prevPage));
+    document.querySelectorAll(".page-next").forEach(b => b.addEventListener("click", nextPage));
+    document.getElementById("prevCover")?.addEventListener("click", prevPage);
+    document.getElementById("nextCover")?.addEventListener("click", nextPage);
+
+    window.addEventListener("keydown", (e) => {
+      const tag = (document.activeElement && document.activeElement.tagName) || "";
+      if(tag.toLowerCase() === "textarea") return;
+      if(e.key === "ArrowLeft") prevPage();
+      if(e.key === "ArrowRight") nextPage();
+    });
+
+    updateUI();
+
+    /* ===== steven-hate gate ===== */
+const stevenPage = document.querySelector('.page[aria-label="steven-hate"]');
+const stevenGate = document.getElementById("stevenGate");
+const stevenPass = document.getElementById("stevenPass");
+const stevenUnlockBtn = document.getElementById("stevenUnlockBtn");
+const stevenErr = document.getElementById("stevenErr");
+
+const STEVEN_CODE = "221855";
+const STEVEN_KEY = "unlock:steven";
+
+function isStevenUnlocked(){
+  try{ return sessionStorage.getItem(STEVEN_KEY) === "1"; }catch(e){ return false; }
+}
+
+function lockSteven(){
+  if(!stevenPage) return;
+  stevenPage.classList.add("locked");
+  if(stevenGate){
+    stevenGate.setAttribute("aria-hidden","false");
+  }
+  if(stevenPass){
+    stevenPass.value = "";
+    stevenErr?.classList.remove("show");
+    // focus after transition so it feels smooth
+    setTimeout(() => stevenPass.focus(), 120);
+  }
+}
+
+function unlockSteven(){
+  if(!stevenPage) return;
+  stevenPage.classList.remove("locked");
+  if(stevenGate){
+    stevenGate.setAttribute("aria-hidden","true");
+  }
+  try{ sessionStorage.setItem(STEVEN_KEY, "1"); }catch(e){}
+}
+
+function handleStevenGate(){
+  if(!stevenPage) return;
+  // only lock when the steven page is the current active page
+  const stevenIsActive = stevenPage.classList.contains("active");
+  if(!stevenIsActive) return;
+
+  if(isStevenUnlocked()){
+    unlockSteven();
+  }else{
+    lockSteven();
+  }
+}
+
+function tryUnlockSteven(){
+  const val = (stevenPass?.value || "").trim();
+  if(val === STEVEN_CODE){
+    unlockSteven();
+  }else{
+    stevenErr?.classList.add("show");
+    if(stevenPass){
+      stevenPass.value = "";
+      stevenPass.focus();
+    }
+  }
+}
+
+stevenUnlockBtn?.addEventListener("click", tryUnlockSteven);
+stevenPass?.addEventListener("keydown", (e) => {
+  if(e.key === "Enter") tryUnlockSteven();
+});
+
+/* hook into page flips: call this after every page change */
+const _oldUpdateUI = updateUI;
+updateUI = function(){
+  _oldUpdateUI();
+  handleStevenGate();
+};
+
+// run once on load in case steven page is first (unlikely)
+handleStevenGate();
+
+
+    /* autosave for right-side text blocks (only used on clashroyale split) */
+    const toast = document.getElementById("toast");
+    let toastTimer = null;
+    function showToast(msg="Saved"){
+      toast.textContent = msg;
+      toast.classList.add("show");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove("show"), 900);
+    }
+
+    document.querySelectorAll("[data-sidekey]").forEach(el => {
+      const key = "sideText:" + el.dataset.sidekey;
+      try{
+        const v = localStorage.getItem(key);
+        if(v !== null) el.textContent = v;
+      }catch(e){}
+      el.addEventListener("input", () => {
+        try{ localStorage.setItem(key, el.textContent); }catch(e){}
+        showToast("Saved");
+      });
+    });
+
+    /* ========= zoom modal ========= */
+    const modal = document.getElementById("modal");
+    const modalImg = document.getElementById("modalImg");
+    const modalTitle = document.getElementById("modalTitle");
+    const zoomClose = document.getElementById("zoomClose");
+    const zoomPrev = document.getElementById("zoomPrev");
+    const zoomNext = document.getElementById("zoomNext");
+
+    const photoCards = [...document.querySelectorAll(".card[data-src]")];
+    let zoomIndex = 0;
+
+    function openZoom(i){
+      zoomIndex = i;
+      const c = photoCards[zoomIndex];
+      modal.classList.add("open");
+      modal.setAttribute("aria-hidden", "false");
+      modalTitle.textContent = c.dataset.title || "Photo";
+      modalImg.src = c.dataset.src;
+    }
+    function closeZoom(){
+      modal.classList.remove("open");
+      modal.setAttribute("aria-hidden", "true");
+      modalImg.src = "";
+    }
+    function stepZoom(d){
+      zoomIndex = (zoomIndex + d + photoCards.length) % photoCards.length;
+      const c = photoCards[zoomIndex];
+      modalTitle.textContent = c.dataset.title || "Photo";
+      modalImg.src = c.dataset.src;
+    }
+
+    photoCards.forEach((c,i) => c.addEventListener("click", () => openZoom(i)));
+    zoomClose.addEventListener("click", closeZoom);
+    zoomPrev.addEventListener("click", () => stepZoom(-1));
+    zoomNext.addEventListener("click", () => stepZoom(1));
+    modal.addEventListener("click", (e) => { if(e.target === modal) closeZoom(); });
+
+    window.addEventListener("keydown", (e) => {
+      if(!modal.classList.contains("open")) return;
+      if(e.key === "Escape") closeZoom();
+      if(e.key === "ArrowLeft") stepZoom(-1);
+      if(e.key === "ArrowRight") stepZoom(1);
+    });
+  </script>
+</body>
+</html>
